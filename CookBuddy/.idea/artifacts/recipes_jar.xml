@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="recipes.jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/recipes_jar</output-path>
+    <root id="archive" name="CookBuddy.jar">
+      <element id="module-output" name="CookBuddy" />
+    </root>
+  </artifact>
+</component>
