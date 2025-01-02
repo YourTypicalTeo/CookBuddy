@@ -8,11 +8,25 @@
     <artifactId>CookBuddy</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>gr.hua.dit.oop2</groupId>
+            <artifactId>countdown</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+    </dependencies>
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <repositories>
+        <repository>
+            <id>gitlab-maven</id>
+            <url>https://gitlab.com/api/v4/projects/41008035/packages/maven</url>
+        </repository>
+    </repositories>
 
     <build>
         <pluginManagement>

@@ -44,7 +44,7 @@ public class Display {
                 case 1 -> viewAllRecipes();
                 case 2 -> viewRecipeDetails(scanner);
                 case 3 -> createShoppingList(scanner);
-                case 4 -> executeRecipe(scanner);
+                case 4 -> DisplayExecution(scanner);
                 case 5 -> {
                     System.out.println("Αντιο! Καλο μαγειρεμα!");
                     exit = true;
@@ -228,35 +228,39 @@ public class Display {
         }
     }
 
-    // TODO μερος 2 εργασιας
-    private void executeRecipe(Scanner scanner) {
-        // Ελεγχει αν υπαρχουν συνταγες για εκτελεση
+    public void DisplayExecution(Scanner scanner) {
         if (recipes.isEmpty()) {
-            System.out.println("Δεν υπαρχουν συνταγες για εκτελεση.");
+            System.out.println("Δεν υπάρχουν συνταγές για εκτέλεση.");
             return;
         }
 
-        while (true) {
-            // εμφανιση ολων των συνταγων
-            viewAllRecipes();
-            System.out.print("Εισαγεται τον αριθμο της συνταγης που θελετε να εκτελεσετε, η πατηστε -1 για επιστροφη στο βασικο μενου: ");
-            int recipeNumber = readIntegerInput(scanner, -1, recipes.size(),
-                    "Μη εγκυρη εισαγωγη. Παρακαλω εισαγεται εναν εγκυρο αριθμο συνταγης η -1 για επιστροφη.");
+        // Display available recipes for execution
+        System.out.println("Παρακαλώ επιλέξτε την συνταγή που θέλετε να εκτελέσετε:");
+        for (int i = 0; i < recipes.size(); i++) {
+            System.out.println((i + 1) + ". " + recipes.get(i).getTitle());
+        }
 
-            if (recipeNumber == -1) { // Επιστροφη στο μενου :(
-                System.out.println("Επιστροφη στο βασικο μενου...");
-                break;
-            }
+        int choice = readIntegerInput(scanner, 1, recipes.size(), "Μη έγκυρη επιλογή. Προσπαθήστε ξανά.");
+        Recipe selectedRecipe = recipes.get(choice - 1);
 
-            com.mycompany.cookbuddy.Recipe selectedRecipe = recipes.get(recipeNumber - 1);
-            System.out.println("\nΕκτελεση Συνταγης: " + selectedRecipe.getTitle());
-            System.out.println("\nΒηματα:");
+        // Delegate recipe execution to RecipeExecutor
+        RecipeExecutor recipeExecutor = new RecipeExecutor(selectedRecipe);
+        recipeExecutor.executeRecipe();
+    }
 
-            List<String> steps = selectedRecipe.getSteps();
-            for (int i = 0; i < steps.size(); i++) {
-                System.out.printf("%d. %s%n", i + 1, steps.get(i));
+    // Helper method to start a countdown for a given duration in seconds
+    private void startCountdown(int durationInSeconds) {
+        for (int remaining = durationInSeconds; remaining > 0; remaining--) {
+            System.out.printf("Απομένουν %d δευτερόλεπτα...%n", remaining);
+            try {
+                Thread.sleep(1000); // Pause for 1 second
+            } catch (InterruptedException e) {
+                System.out.println("Η αντίστροφη μέτρηση διακόπηκε.");
+                Thread.currentThread().interrupt();
+                return;
             }
         }
+        System.out.println("Ο χρόνος για αυτό το βήμα ολοκληρώθηκε!");
     }
     // Βοηθητικη method για αναγνωση και επικηρωση εισαγωγης ακεραιου απο τον χρηστη
     private int readIntegerInput(Scanner scanner, int min, int max, String errorMessage) {
