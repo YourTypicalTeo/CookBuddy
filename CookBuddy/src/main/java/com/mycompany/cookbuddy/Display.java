@@ -1,165 +1,170 @@
 package com.mycompany.cookbuddy;
-/*
- *
- * @author JAVA ASSIGNMENT 2024-2025 Βοηθος Μαγειρας
-it2023101_it2023140_it2023024
- *
- */
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
-public class Display {
-    private final List<com.mycompany.cookbuddy.Recipe> recipes;
+public class Display extends JFrame {
+    private final List<Recipe> recipes;
+    private final JTextArea displayArea;
+    private final JButton btnViewAllRecipes;
+    private final JButton btnViewRecipeDetails;
+    private final JButton btnCreateShoppingList;
+    private final JButton btnExecuteRecipe;
+    private final JButton btnExit;
 
-    public Display(List<com.mycompany.cookbuddy.Recipe> recipes) {
+    public Display(List<Recipe> recipes) {
         this.recipes = recipes;
-    }
+        setTitle("Cook Buddy");
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-    public void displayMenu() {
-        // Ελεγχει αν υπαρχουν συνταγες για προβολη η εκτελεση
-        if (recipes.isEmpty()) {
-            System.out.println("Δεν υπαρχουν συνταγες για προβολη η εκτελεση.");
-            return;
-        }
+        // Text area to display recipes
+        displayArea = new JTextArea();
+        displayArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(displayArea);
+        add(scrollPane, BorderLayout.CENTER);
 
-        Scanner scanner = new Scanner(System.in);
-        boolean exit = false;
+        // Panel for buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(5, 1));
 
-        while (!exit) {
-            // Εμφανιση βασικου μενου επιλογων
-            System.out.println("\nΚαλως ηρθατε στον Βοηθο Μαγειρα! Παρακαλω επιλεξτε μια επιλογη:");
-            System.out.println("1. Προβολη Ολων των Συνταγων");
-            System.out.println("2. Προβολη Λεπτομερειων Συνταγης");
-            System.out.println("3. Δημιουργια Λιστας Αγορων");
-            System.out.println("4. Εκτελεση Συνταγης");
-            System.out.println("5. Εξοδος");
-            System.out.print("Εισαγεται την επιλογη σας: ");
+        btnViewAllRecipes = new JButton("View All Recipes");
+        btnViewRecipeDetails = new JButton("View Recipe Details");
+        btnCreateShoppingList = new JButton("Create Shopping List");
+        btnExecuteRecipe = new JButton("Execute Recipe");
+        btnExit = new JButton("Exit");
 
-            // ejasfalish  εγκυρης εισαγωγης επιλογης
-            int choice = readIntegerInput(scanner, 1, 5, "Μη εγκυρη επιλογη. Παρακαλω εισαγεται εναν αριθμο απο 1 εως 5.");
+        buttonPanel.add(btnViewAllRecipes);
+        buttonPanel.add(btnViewRecipeDetails);
+        buttonPanel.add(btnCreateShoppingList);
+        buttonPanel.add(btnExecuteRecipe);
+        buttonPanel.add(btnExit);
 
-            // Επεξεργασια επιλογων χρηστη
-            switch (choice) {
-                case 1 -> viewAllRecipes();
-                case 2 -> viewRecipeDetails(scanner);
-                case 3 -> createShoppingList(scanner);
-                case 4 -> DisplayExecution(scanner);
-                case 5 -> {
-                    System.out.println("Αντιο! Καλο μαγειρεμα!");
-                    exit = true;
+        add(buttonPanel, BorderLayout.WEST);
+
+        // Button actions
+        btnViewAllRecipes.addActionListener(e -> viewAllRecipes());
+
+        btnViewRecipeDetails.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Ask the user for the number of people
+                String input = JOptionPane.showInputDialog(Display.this, "Enter the number of people:");
+                try {
+                    int numberOfPeople = Integer.parseInt(input);
+                    if (numberOfPeople > 0) {
+                        // Prompt user to select a recipe
+                        String[] options = new String[recipes.size()];
+                        for (int i = 0; i < recipes.size(); i++) {
+                            options[i] = recipes.get(i).getTitle();
+                        }
+
+                        String selectedRecipe = (String) JOptionPane.showInputDialog(Display.this,
+                                "Select a recipe to view details:", "Recipe Details",
+                                JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+                        if (selectedRecipe != null) {
+                            Recipe recipe = recipes.stream()
+                                    .filter(r -> r.getTitle().equals(selectedRecipe))
+                                    .findFirst().orElse(null);
+                            if (recipe != null) {
+                                // Display recipe details
+                                viewRecipeDetails(recipe, numberOfPeople);
+                            }
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(Display.this, "Please enter a valid number of people.");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(Display.this, "Invalid number format. Please enter a valid number.");
                 }
-                default -> // Δεν θα επρεπε να συμβει  :(
-                        System.out.println("Μη εγκυρη επιλογη. Προσπαθηστε ξανα!");
             }
-        }
+        });
+
+        btnCreateShoppingList.addActionListener(e -> createShoppingList());
+
+        btnExecuteRecipe.addActionListener(e -> executeRecipe());
+
+        btnExit.addActionListener(e -> System.exit(0));
     }
 
-    // method για προβολη ολων των συνταγων
     private void viewAllRecipes() {
         if (recipes.isEmpty()) {
-            System.out.println("Δεν υπαρχουν συνταγες διαθεσιμες.");
+            displayArea.setText("No recipes available.");
         } else {
-            System.out.println("\nΔιαθεσιμες συνταγες:");
+            StringBuilder recipeList = new StringBuilder("Available Recipes:\n");
             for (int i = 0; i < recipes.size(); i++) {
-                System.out.printf("%d. %s%n", i + 1, recipes.get(i).getTitle());
+                recipeList.append((i + 1) + ". " + recipes.get(i).getTitle() + "\n");
             }
+            displayArea.setText(recipeList.toString());
         }
     }
 
-    // Μεθοδος για προβολη λεπτομερειων μιας συνταγης
-    private void viewRecipeDetails(Scanner scanner) {
-        if (recipes.isEmpty()) {
-            System.out.println("Δεν υπαρχουν συνταγες διαθεσιμες.");
-            return;
-        }
+    private void viewRecipeDetails(Recipe recipe, int numberOfPeople) {
+        StringBuilder recipeDetails = new StringBuilder();
 
-        while (true) {
-            // Εμφανιση ολων των συνταγων
-            viewAllRecipes();
-            System.out.print("Εισαγεται τον αριθμο της συνταγης για προβολη λεπτομερειων, η πατηστε -1 για επιστροφη στο βασικο μενου: ");
-            int recipeNumber = readIntegerInput(scanner, -1, recipes.size(),
-                    "Μη εγκυρη εισαγωγη. Παρακαλω εισαγεται εναν εγκυρο αριθμο συνταγης η -1 για επιστροφη.");
+        recipeDetails.append("Συνταγη: " + recipe.getTitle() + "\n\n");
 
-            if (recipeNumber == -1) { // Επιστροφη στο μενου
-                System.out.println("Επιστροφη στο βασικο μενου...");
-                break;
-            }
-
-            // Επιλογη ποιας συνταγης
-            Recipe selectedRecipe = recipes.get(recipeNumber - 1);
-
-            // Ζηταει αριθμο ατομων για τους οποιους προοριζεται η συνταγη
-            System.out.print("Εισαγεται τον αριθμο ατομων για τους οποιους μαγειρευετε: ");
-            int numberOfPeople = readIntegerInput(scanner, 1, Integer.MAX_VALUE,
-                    "Μη εγκυρη εισαγωγη. Παρακαλω εισαγεται εναν εγκυρο αριθμο ατομων (τουλαχιστον 1).");
-
-            // Προβολη λεπτομερειων της συνταγης, προσαρμοσμενων στον αριθμο των ατομων
-            System.out.println("Συνταγη για " + numberOfPeople + " ατομα:");
-            displayScaledRecipe(selectedRecipe, numberOfPeople);
-        }
-    }
-
-    // methodς για προβολη της συνταγης προσαρμοσμενης για συγκεκριμενο αριθμο ατομων
-    private void displayScaledRecipe(Recipe recipe, int numberOfPeople) {
-        System.out.println("Συνταγη: " + recipe.getTitle());
-
-        // Προσαρμογη και εκτυπωση των υλικων
+        // Προσαρμογή και εκτύπωση των υλικών
         if (!recipe.getIngredients().isEmpty()) {
-            System.out.println("Υλικα:");
+            recipeDetails.append("Υλικα:\n");
             for (String ingredient : recipe.getIngredients()) {
-                ingredient = ingredient.replaceAll("[@%{}]", ""); // Καθαρισμος ειδικων συμβολων
-                System.out.println(" - " + scaleIngredientQuantity(ingredient, numberOfPeople));
+                ingredient = ingredient.replaceAll("[@%{}]", ""); // Καθαρισμός ειδικών συμβόλων
+                recipeDetails.append(" - " + scaleIngredientQuantity(ingredient, numberOfPeople) + "\n");
             }
         } else {
-            System.out.println("Υλικα: Δεν διατιθενται.");
+            recipeDetails.append("Υλικα: Δεν διατιθενται.\n");
         }
 
-        //  // Εκτυπωση των εργαλειων (χωρις προσαρμογη)
+        // Εκτύπωση των σκευών (χωρίς προσαρμογή)
         if (!recipe.getUtensils().isEmpty()) {
-            System.out.println("Σκέυη:");
+            recipeDetails.append("\nΣκέυη:\n");
             for (String utensil : recipe.getUtensils()) {
                 utensil = utensil.replaceAll("[#{}]", " ");
-                System.out.println(" - " + utensil);
+                recipeDetails.append(" - " + utensil + "\n");
             }
         } else {
-            System.out.println("Σκέυη: Δεν διατιθενται.");
-        }
-        // Εκτυπωση των βηματων (χωρις προσαρμογς)
-        if (!recipe.getSteps().isEmpty()) {
-            System.out.println("Βηματα:");
-            for (int i = 0; i < recipe.getSteps().size(); i++) {
-                //βαλαμε replaceALL για να ειναι πιο Clean το output
-                String step = recipe.getSteps().get(i).replaceAll("[@#%{}~]", " ");
-                System.out.println((i + 1) + ". " + step);
-            }
-        } else {
-            System.out.println("Βηματα: Δεν διατιθενται.");
+            recipeDetails.append("\nΣκέυη: Δεν διατιθενται.\n");
         }
 
-        // Εκτυπωση χρονων (χωρις προσαρμογες)
+        // Εκτύπωση των βημάτων (χωρίς προσαρμογές)
+        if (!recipe.getSteps().isEmpty()) {
+            recipeDetails.append("\nΒηματα:\n");
+            for (int i = 0; i < recipe.getSteps().size(); i++) {
+                String step = recipe.getSteps().get(i).replaceAll("[@#%{}~]", " ");
+                recipeDetails.append((i + 1) + ". " + step + "\n");
+            }
+        } else {
+            recipeDetails.append("\nΒηματα: Δεν διατιθενται.\n");
+        }
+
+        // Εκτύπωση χρόνων (χωρίς προσαρμογές)
         if (!recipe.getTimes().isEmpty()) {
-            // Συνολικος χρονος
             int totalTime = recipe.getTotalTime();
-            System.out.println("Χρόνος:");
-            if (totalTime<60) {
-                System.out.println("Συνολικος απαιτουμενος χρονος: " + totalTime + " λεπτα");
-            }
-            if(totalTime>60 && totalTime<120) {
+            recipeDetails.append("\nΧρόνος:\n");
+            if (totalTime < 60) {
+                recipeDetails.append("Συνολικος απαιτουμενος χρονος: " + totalTime + " λεπτα\n");
+            } else if (totalTime > 60 && totalTime < 120) {
                 int minutes = totalTime % 60;
-                System.out.println("Συνολικος απαιτουμενος χρονος: 1 ωρα " + minutes + " λεπτα");
-            }
-            else if(totalTime>120) {
+                recipeDetails.append("Συνολικος απαιτουμενος χρονος: 1 ωρα " + minutes + " λεπτα\n");
+            } else if (totalTime > 120) {
                 int minutes = totalTime % 60;
                 int hours = totalTime / 60;
-                System.out.println("Συνολικος απαιτουμενος χρονος:" + hours +  " ωρες" + minutes + " λεπτα");
+                recipeDetails.append("Συνολικος απαιτουμενος χρονος: " + hours + " ωρες " + minutes + " λεπτα\n");
             }
         } else {
-            System.out.println("Χρονος: Δεν διατιθενται.");
+            recipeDetails.append("\nΧρονος: Δεν διατιθενται.\n");
         }
+
+        // Display the formatted recipe in the JTextArea
+        displayArea.setText(recipeDetails.toString());
     }
 
-    // Μεθοδος για προσαρμογη ποσοτητας υλικων στον αριθμο των ατομων
     private String scaleIngredientQuantity(String ingredient, int numberOfPeople) {
         String[] parts = ingredient.trim().split(" ", 2);
 
@@ -188,91 +193,93 @@ public class Display {
         }
     }
 
-    private void createShoppingList(Scanner scanner) {
-        // ελεγχος για το εαν υπαρχουν συνταγες για δημιουργια λιστας αγορων
+    private void createShoppingList() {
+        // Check if there are any recipes for shopping list creation
         if (recipes.isEmpty()) {
-            System.out.println("Δεν υπαρχουν συνταγες για δημιουργια λιστας αγορων.");
+            displayArea.setText("Δεν υπάρχουν συνταγές για δημιουργία λίστας αγορών.");
             return;
         }
 
-        List<com.mycompany.cookbuddy.Recipe> selectedRecipes = new ArrayList<>();
+        List<Recipe> selectedRecipes = new ArrayList<>();
         while (true) {
-            // Εμφανιση ολων των συνταγων
+            // Show all recipes in the display area
             viewAllRecipes();
-            System.out.print("Εισαγεται τον αριθμο της συνταγης για προσθηκη στη λιστα αγορων, η πατηστε -1 για ολοκληρωση: ");
 
-            int recipeNumber = readIntegerInput(scanner, -1, recipes.size(),
-                    "Μη εγκυρη εισαγωγη. Παρακαλω εισαγεται εναν εγκυρο αριθμο συνταγης η -1 για ολοκληρωση.");
+            // Show dialog for the user to choose a recipe to add to shopping list
+            String[] options = new String[recipes.size()];
+            for (int i = 0; i < recipes.size(); i++) {
+                options[i] = recipes.get(i).getTitle();
+            }
 
-            if (recipeNumber == -1) { // Ολοκληρωση δημιουργιας της λιστας αγορων
+            String selectedRecipeTitle = (String) JOptionPane.showInputDialog(this,
+                    "Εισάγετε τον αριθμό της συνταγής για προσθήκη στη λίστα αγορών ή πατήστε Cancel για ολοκλήρωση:",
+                    "Λίστα Αγορών", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+            if (selectedRecipeTitle == null) {
+                // User clicked Cancel or closed the dialog, stop adding to the shopping list
                 break;
             }
 
-            com.mycompany.cookbuddy.Recipe selectedRecipe = recipes.get(recipeNumber - 1);
+            Recipe selectedRecipe = recipes.stream()
+                    .filter(r -> r.getTitle().equals(selectedRecipeTitle))
+                    .findFirst().orElse(null);
 
-            // Ελεγχος αν η συνταγη ειναι ηδη στη λιστα
-            if (selectedRecipes.contains(selectedRecipe)) {
-                System.out.println("Η συνταγη \"" + selectedRecipe.getTitle() + "\" ειναι ηδη στη λιστα αγορων.");
-            } else {
+            // Check if the recipe is already in the shopping list
+            if (selectedRecipe != null && selectedRecipes.contains(selectedRecipe)) {
+                JOptionPane.showMessageDialog(this, "Η συνταγή \"" + selectedRecipe.getTitle() + "\" είναι ήδη στη λίστα αγορών.");
+            } else if (selectedRecipe != null) {
                 selectedRecipes.add(selectedRecipe);
-                System.out.println("Προσθεθηκε \"" + selectedRecipe.getTitle() + "\" στη λιστα αγορων.");
+                JOptionPane.showMessageDialog(this, "Προστέθηκε \"" + selectedRecipe.getTitle() + "\" στη λίστα αγορών.");
             }
         }
 
         if (selectedRecipes.isEmpty()) {
-            System.out.println("Η λιστα αγορων ειναι αδεια.");
+            displayArea.setText("Η λίστα αγορών είναι άδεια.");
         } else {
-            ShoppingList shoppingList = new ShoppingList();
+            // Generate the shopping list
+            ShoppingList shoppingList = new ShoppingList(displayArea);
             shoppingList.generateShoppingList(selectedRecipes);
-            System.out.println("Η λιστα αγορων δημιουργηθηκε επιτυχως!");
+            displayArea.setText("Η λίστα αγορών δημιουργήθηκε επιτυχώς!");
         }
     }
-
-    public void DisplayExecution(Scanner scanner) {
+    private void executeRecipe() {
         if (recipes.isEmpty()) {
-            System.out.println("Δεν υπάρχουν συνταγές για εκτέλεση.");
+            displayArea.setText("No recipes available to execute.");
             return;
         }
 
-        // Display available recipes for execution
-        System.out.println("Παρακαλώ επιλέξτε την συνταγή που θέλετε να εκτελέσετε:");
+        String[] options = new String[recipes.size()];
         for (int i = 0; i < recipes.size(); i++) {
-            System.out.println((i + 1) + ". " + recipes.get(i).getTitle());
+            options[i] = recipes.get(i).getTitle();
         }
 
-        int choice = readIntegerInput(scanner, 1, recipes.size(), "Μη έγκυρη επιλογή. Προσπαθήστε ξανά.");
-        Recipe selectedRecipe = recipes.get(choice - 1);
+        String selectedRecipe = (String) JOptionPane.showInputDialog(this,
+                "Select a recipe to execute:", "Execute Recipe",
+                JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-        // Delegate recipe execution to RecipeExecutor
-        RecipeExecutor recipeExecutor = new RecipeExecutor(selectedRecipe);
-        recipeExecutor.executeRecipe();
-    }
+        if (selectedRecipe != null) {
+            Recipe recipe = recipes.stream()
+                    .filter(r -> r.getTitle().equals(selectedRecipe))
+                    .findFirst().orElse(null);
+            if (recipe != null) {
+                // Execute recipe asynchronously using SwingWorker
+                new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        // Update JTextArea asynchronously
+                        displayArea.append("\nΞεκινάμε την εκτέλεση της συνταγής: " + recipe.getTitle() + "\n");
 
-    // Helper method to start a countdown for a given duration in seconds
-    private void startCountdown(int durationInSeconds) {
-        for (int remaining = durationInSeconds; remaining > 0; remaining--) {
-            System.out.printf("Απομένουν %d δευτερόλεπτα...%n", remaining);
-            try {
-                Thread.sleep(1000); // Pause for 1 second
-            } catch (InterruptedException e) {
-                System.out.println("Η αντίστροφη μέτρηση διακόπηκε.");
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }
-        System.out.println("Ο χρόνος για αυτό το βήμα ολοκληρώθηκε!");
-    }
-    // Βοηθητικη method για αναγνωση και επικηρωση εισαγωγης ακεραιου απο τον χρηστη
-    private int readIntegerInput(Scanner scanner, int min, int max, String errorMessage) {
-        while (true) {
-            try {
-                int input = Integer.parseInt(scanner.nextLine().trim());
-                if (input >= min && input <= max) {
-                    return input;
-                }
-                System.out.println(errorMessage);
-            } catch (NumberFormatException e) {
-                System.out.println("Μη εγκυρη εισαγωγη. Παρακαλω εισαγεται εναν εγκυρο αριθμο.");
+                        RecipeExecutor recipeExecutor = new RecipeExecutor(recipe, displayArea);
+                        recipeExecutor.executeRecipe();  // Execute the recipe in the background
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        // Optional: Show a message when the recipe execution is done
+                        displayArea.append("\nΗ συνταγή ολοκληρώθηκε επιτυχώς! Καλή σας όρεξη!\n");
+                    }
+                }.execute();  // Start the SwingWorker to run asynchronously
             }
         }
     }

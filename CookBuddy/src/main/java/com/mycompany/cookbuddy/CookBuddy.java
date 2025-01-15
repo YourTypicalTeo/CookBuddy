@@ -1,5 +1,6 @@
 package com.mycompany.cookbuddy;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.*;
 
@@ -17,20 +18,20 @@ public class CookBuddy {
         // Σημαια για ελεγχο χρησης της επιλογης -list
         boolean isListMode = args[0].equals("-list");
 
- // Συλλογη διαδρομων αρχειων, επαληθευση αυτων και ελεγχος για διπλοτυπα 
+        // Συλλογη διαδρομων αρχειων, επαληθευση αυτων και ελεγχος για διπλοτυπα
         Set<String> uniqueFilePaths = new HashSet<>();
         List<String> filePaths = new ArrayList<>();
-        int startIndex = isListMode ? 1 : 0; // Ξεκιναμε  απο το 1 αν χρησιμοποιηθει το -list
+        int startIndex = isListMode ? 1 : 0; // Ξεκιναμε απο το 1 αν χρησιμοποιηθει το -list
 
         for (int i = startIndex; i < args.length; i++) {
             String filePath = args[i];
             // Ελεγχος για διπλοτυπα αρχεια
             if (!uniqueFilePaths.add(filePath)) {
                 System.out.println("Σφαλμα: Ανιχνευθηκε διπλοτυπο αρχειο: " + filePath);
-                System.exit(1); // Κατευθειαν εξοδος αν ανιχνευθει διπλοτυπο 
+                System.exit(1); // Κατευθειαν εξοδος αν ανιχνευθει διπλοτυπο
             }
 
- // Επαληθευση αρχειου
+            // Επαληθευση αρχειου
             if (!isValidFile(filePath)) {
                 System.out.println("Σφαλμα: Παρεχομενο αρχειο δεν ειναι εγκυρο: " + filePath);
                 System.exit(1); // Αμεση εξοδος αν καποιο αρχειο δεν ειναι εγκυρο
@@ -39,41 +40,45 @@ public class CookBuddy {
             filePaths.add(filePath);
         }
 
-// Διαχειριση της  λογικης για το -list
+        // Διαχειριση της λογικης για το -list
         if (isListMode) {
             if (filePaths.isEmpty()) {
                 System.out.println("Δεν δοθηκαν εγκυρα αρχεια με το '-list'. Εξοδος...");
                 System.exit(1);
             }
 
- // Φορτωνουμε  και δημιουργουμε μια λιστας αγορων
+            // Φορτώνουμε και δημιουργούμε μια λίστα αγορών
             List<Recipe> recipes = recipeLoader.loadMultipleRecipes(filePaths);
             if (recipes.isEmpty()) {
                 System.out.println("Δεν βρεθηκαν εγκυρες συνταγες για τη λιστα αγορων. Εξοδος...");
                 System.exit(1);
             }
 
-            ShoppingList shoppingList = new ShoppingList();
+// Assuming you have a JTextArea for displaying results
+            JTextArea displayArea = new JTextArea();
+            displayArea.setEditable(false); // To make it non-editable
+
+// Then, create the ShoppingList with the displayArea
+            ShoppingList shoppingList = new ShoppingList(displayArea);
             shoppingList.generateShoppingList(recipes);
             return;
         }
 
-  // απλη  επεξεργασια αρχειων (χωρις το -list)
+        // Απλή επεξεργασία αρχείων (χωρίς το -list)
         List<Recipe> recipes = recipeLoader.loadMultipleRecipes(filePaths);
         if (recipes.isEmpty()) {
             System.out.println("Δεν βρεθηκαν εγκυρες συνταγες. Εξοδος...");
             System.exit(1);
         }
 
-  // Μεταφερουμε συνταγες στην κλαση Display 
+        // Μεταφέρουμε συνταγές στην κλάση Display για GUI
         Display display = new Display(recipes);
-        display.displayMenu();
+        display.setVisible(true); // Αυτό είναι που εμφανίζει το GUI για τις συνταγές
     }
 
- // εδω μια βοηθητικη μεθοδος για τσεκ υπαρξης και επεκτασης αρχειου
+    // Βοηθητική μέθοδος για τσεκ ύπαρξης και επέκτασης αρχείου
     private static boolean isValidFile(String filePath) {
         File file = new File(filePath);
         return file.exists() && file.isFile() && filePath.endsWith(".cook");
     }
 }
-
