@@ -1,5 +1,10 @@
 package com.mycompany.cookbuddy;
-
+/*
+ *
+ * @author JAVA ASSIGNMENT 2024-2025 Βοηθός Μάγειρας
+it2023101_it2023140_it2023024
+ *
+ */
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -126,7 +131,6 @@ public class TextProcessor {
             double quantity = Double.parseDouble(numericPart);
             return new Ingredient(quantity, unitPart.isEmpty() ? "" : unitPart);
         } catch (NumberFormatException e) {
-            System.out.println("Προειδοποιηση: Μη εγκυρη μορφη ποσοτητας συστατικου: " + quantityStr);
             return new Ingredient(0.0, ""); // Προεπιλεγμενη τιμη
         }
     }

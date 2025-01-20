@@ -1,5 +1,10 @@
 package com.mycompany.cookbuddy;
-
+/*
+ *
+ * @author JAVA ASSIGNMENT 2024-2025 Βοηθός Μάγειρας
+it2023101_it2023140_it2023024
+ *
+ */
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Display extends JFrame {
-    private final List<Recipe> recipes;
-    private final JTextArea displayArea;
-    private final JButton btnViewAllRecipes;
-    private final JButton btnViewRecipeDetails;
-    private final JButton btnCreateShoppingList;
-    private final JButton btnExecuteRecipe;
-    private final JButton btnExit;
+    private List<Recipe> recipes;
+    private JTextArea displayArea;
+    private JButton btnViewAllRecipes;
+    private JButton btnViewRecipeDetails;
+    private JButton btnCreateShoppingList;
+    private JButton btnExecuteRecipe;
+    private JButton btnExit;
 
     public Display(List<Recipe> recipes) {
         this.recipes = recipes;
@@ -23,21 +28,21 @@ public class Display extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Text area to display recipes
+        // Περιοχή κειμένου για εμφάνιση συνταγών
         displayArea = new JTextArea();
         displayArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(displayArea);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Panel for buttons
+        // Πάνελ για τα κουμπιά
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(5, 1));
 
-        btnViewAllRecipes = new JButton("View All Recipes");
-        btnViewRecipeDetails = new JButton("View Recipe Details");
-        btnCreateShoppingList = new JButton("Create Shopping List");
-        btnExecuteRecipe = new JButton("Execute Recipe");
-        btnExit = new JButton("Exit");
+        btnViewAllRecipes = new JButton("Προβολή Όλων των Συνταγών");
+        btnViewRecipeDetails = new JButton("Προβολή Λεπτομερειών Συνταγής");
+        btnCreateShoppingList = new JButton("Δημιουργία Λίστας Αγορών");
+        btnExecuteRecipe = new JButton("Εκτέλεση Συνταγής");
+        btnExit = new JButton("Έξοδος");
 
         buttonPanel.add(btnViewAllRecipes);
         buttonPanel.add(btnViewRecipeDetails);
@@ -47,25 +52,25 @@ public class Display extends JFrame {
 
         add(buttonPanel, BorderLayout.WEST);
 
-        // Button actions
+        // Ενέργειες κουμπιών
         btnViewAllRecipes.addActionListener(e -> viewAllRecipes());
 
         btnViewRecipeDetails.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Ask the user for the number of people
-                String input = JOptionPane.showInputDialog(Display.this, "Enter the number of people:");
+                // Ζητάμε από τον χρήστη να εισάγει τον αριθμό ατόμων
+                String input = JOptionPane.showInputDialog(Display.this, "Εισάγετε τον αριθμό των ατόμων:");
                 try {
                     int numberOfPeople = Integer.parseInt(input);
                     if (numberOfPeople > 0) {
-                        // Prompt user to select a recipe
+                        // Προτροπή στον χρήστη να επιλέξει συνταγή
                         String[] options = new String[recipes.size()];
                         for (int i = 0; i < recipes.size(); i++) {
                             options[i] = recipes.get(i).getTitle();
                         }
 
                         String selectedRecipe = (String) JOptionPane.showInputDialog(Display.this,
-                                "Select a recipe to view details:", "Recipe Details",
+                                "Επιλέξτε μια συνταγή για προβολή λεπτομερειών:", "Λεπτομέρειες Συνταγής",
                                 JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
                         if (selectedRecipe != null) {
@@ -73,15 +78,15 @@ public class Display extends JFrame {
                                     .filter(r -> r.getTitle().equals(selectedRecipe))
                                     .findFirst().orElse(null);
                             if (recipe != null) {
-                                // Display recipe details
+                                // Εμφάνιση λεπτομερειών συνταγής
                                 viewRecipeDetails(recipe, numberOfPeople);
                             }
                         }
                     } else {
-                        JOptionPane.showMessageDialog(Display.this, "Please enter a valid number of people.");
+                        JOptionPane.showMessageDialog(Display.this, "Παρακαλώ εισάγετε έγκυρο αριθμό ατόμων.");
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(Display.this, "Invalid number format. Please enter a valid number.");
+                    JOptionPane.showMessageDialog(Display.this, "Μη έγκυρη μορφή αριθμού. Παρακαλώ εισάγετε έγκυρο αριθμό.");
                 }
             }
         });
@@ -94,10 +99,11 @@ public class Display extends JFrame {
     }
 
     private void viewAllRecipes() {
+        // Εμφάνιση όλων των διαθέσιμων συνταγών
         if (recipes.isEmpty()) {
-            displayArea.setText("No recipes available.");
+            displayArea.setText("Δεν υπάρχουν διαθέσιμες συνταγές.");
         } else {
-            StringBuilder recipeList = new StringBuilder("Available Recipes:\n");
+            StringBuilder recipeList = new StringBuilder("Διαθέσιμες Συνταγές:\n");
             for (int i = 0; i < recipes.size(); i++) {
                 recipeList.append((i + 1) + ". " + recipes.get(i).getTitle() + "\n");
             }
@@ -108,39 +114,39 @@ public class Display extends JFrame {
     private void viewRecipeDetails(Recipe recipe, int numberOfPeople) {
         StringBuilder recipeDetails = new StringBuilder();
 
-        recipeDetails.append("Συνταγη: " + recipe.getTitle() + "\n\n");
+        recipeDetails.append("Συνταγή: " + recipe.getTitle() + "\n\n");
 
         // Προσαρμογή και εκτύπωση των υλικών
         if (!recipe.getIngredients().isEmpty()) {
-            recipeDetails.append("Υλικα:\n");
+            recipeDetails.append("Υλικά:\n");
             for (String ingredient : recipe.getIngredients()) {
                 ingredient = ingredient.replaceAll("[@%{}]", ""); // Καθαρισμός ειδικών συμβόλων
                 recipeDetails.append(" - " + scaleIngredientQuantity(ingredient, numberOfPeople) + "\n");
             }
         } else {
-            recipeDetails.append("Υλικα: Δεν διατιθενται.\n");
+            recipeDetails.append("Υλικά: Δεν διατίθενται.\n");
         }
 
         // Εκτύπωση των σκευών (χωρίς προσαρμογή)
         if (!recipe.getUtensils().isEmpty()) {
-            recipeDetails.append("\nΣκέυη:\n");
+            recipeDetails.append("\nΣκεύη:\n");
             for (String utensil : recipe.getUtensils()) {
                 utensil = utensil.replaceAll("[#{}]", " ");
                 recipeDetails.append(" - " + utensil + "\n");
             }
         } else {
-            recipeDetails.append("\nΣκέυη: Δεν διατιθενται.\n");
+            recipeDetails.append("\nΣκεύη: Δεν διατίθενται.\n");
         }
 
         // Εκτύπωση των βημάτων (χωρίς προσαρμογές)
         if (!recipe.getSteps().isEmpty()) {
-            recipeDetails.append("\nΒηματα:\n");
+            recipeDetails.append("\nΒήματα:\n");
             for (int i = 0; i < recipe.getSteps().size(); i++) {
                 String step = recipe.getSteps().get(i).replaceAll("[@#%{}~]", " ");
                 recipeDetails.append((i + 1) + ". " + step + "\n");
             }
         } else {
-            recipeDetails.append("\nΒηματα: Δεν διατιθενται.\n");
+            recipeDetails.append("\nΒήματα: Δεν διατίθενται.\n");
         }
 
         // Εκτύπωση χρόνων (χωρίς προσαρμογές)
@@ -148,53 +154,53 @@ public class Display extends JFrame {
             int totalTime = recipe.getTotalTime();
             recipeDetails.append("\nΧρόνος:\n");
             if (totalTime < 60) {
-                recipeDetails.append("Συνολικος απαιτουμενος χρονος: " + totalTime + " λεπτα\n");
+                recipeDetails.append("Συνολικός απαιτούμενος χρόνος: " + totalTime + " λεπτά\n");
             } else if (totalTime > 60 && totalTime < 120) {
                 int minutes = totalTime % 60;
-                recipeDetails.append("Συνολικος απαιτουμενος χρονος: 1 ωρα " + minutes + " λεπτα\n");
+                recipeDetails.append("Συνολικός απαιτούμενος χρόνος: 1 ώρα " + minutes + " λεπτά\n");
             } else if (totalTime > 120) {
                 int minutes = totalTime % 60;
                 int hours = totalTime / 60;
-                recipeDetails.append("Συνολικος απαιτουμενος χρονος: " + hours + " ωρες " + minutes + " λεπτα\n");
+                recipeDetails.append("Συνολικός απαιτούμενος χρόνος: " + hours + " ώρες " + minutes + " λεπτά\n");
             }
         } else {
-            recipeDetails.append("\nΧρονος: Δεν διατιθενται.\n");
+            recipeDetails.append("\nΧρόνος: Δεν διατίθενται.\n");
         }
 
-        // Display the formatted recipe in the JTextArea
+        // Εμφάνιση της μορφοποιημένης συνταγής στην περιοχή κειμένου
         displayArea.setText(recipeDetails.toString());
     }
 
     private String scaleIngredientQuantity(String ingredient, int numberOfPeople) {
         String[] parts = ingredient.trim().split(" ", 2);
 
-        // Return the ingredient as-is if no quantity is present
+        // Επιστροφή του υλικού όπως είναι αν δεν υπάρχει ποσότητα
         if (parts.length < 2) {
             return ingredient;
         }
 
         try {
-            String quantityStr = parts[0]; // Extract the numeric part
-            String restOfIngredient = parts[1]; // Extract the rest (e.g., "αλεύρι gr")
+            String quantityStr = parts[0]; // Απόσπασμα του αριθμητικού μέρους
+            String restOfIngredient = parts[1]; // Απόσπασμα του υπόλοιπου (π.χ. "αλεύρι gr")
 
-            // Convert to double and scale
+            // Μετατροπή σε double και προσαρμογή
             double originalQuantity = Double.parseDouble(quantityStr);
             double scaledQuantity = originalQuantity * numberOfPeople;
 
-            // Avoid unnecessary decimals for integers
+            // Αποφυγή περιττών δεκαδικών για ακέραιους αριθμούς
             if (scaledQuantity == (int) scaledQuantity) {
                 return (int) scaledQuantity + " " + restOfIngredient;
             } else {
                 return String.format("%.2f", scaledQuantity) + " " + restOfIngredient;
             }
         } catch (NumberFormatException e) {
-            // If parsing fails (e.g., "μια πρέζα αλάτι"), return the ingredient as-is
+            // Αν η μετατροπή αποτύχει (π.χ., "μια πρέζα αλάτι"), επιστρέφουμε το υλικό όπως είναι
             return ingredient;
         }
     }
 
     private void createShoppingList() {
-        // Check if there are any recipes for shopping list creation
+        // Έλεγχος αν υπάρχουν συνταγές για δημιουργία λίστας αγορών
         if (recipes.isEmpty()) {
             displayArea.setText("Δεν υπάρχουν συνταγές για δημιουργία λίστας αγορών.");
             return;
@@ -202,10 +208,10 @@ public class Display extends JFrame {
 
         List<Recipe> selectedRecipes = new ArrayList<>();
         while (true) {
-            // Show all recipes in the display area
+            // Εμφάνιση όλων των συνταγών στην περιοχή εμφάνισης
             viewAllRecipes();
 
-            // Show dialog for the user to choose a recipe to add to shopping list
+            // Διάλογος για την επιλογή συνταγής για προσθήκη στη λίστα αγορών
             String[] options = new String[recipes.size()];
             for (int i = 0; i < recipes.size(); i++) {
                 options[i] = recipes.get(i).getTitle();
@@ -216,7 +222,7 @@ public class Display extends JFrame {
                     "Λίστα Αγορών", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
             if (selectedRecipeTitle == null) {
-                // User clicked Cancel or closed the dialog, stop adding to the shopping list
+                // Ο χρήστης πάτησε Cancel ή έκλεισε το παράθυρο διαλόγου, διακοπή προσθήκης
                 break;
             }
 
@@ -224,7 +230,7 @@ public class Display extends JFrame {
                     .filter(r -> r.getTitle().equals(selectedRecipeTitle))
                     .findFirst().orElse(null);
 
-            // Check if the recipe is already in the shopping list
+            // Έλεγχος αν η συνταγή είναι ήδη στη λίστα αγορών
             if (selectedRecipe != null && selectedRecipes.contains(selectedRecipe)) {
                 JOptionPane.showMessageDialog(this, "Η συνταγή \"" + selectedRecipe.getTitle() + "\" είναι ήδη στη λίστα αγορών.");
             } else if (selectedRecipe != null) {
@@ -236,15 +242,15 @@ public class Display extends JFrame {
         if (selectedRecipes.isEmpty()) {
             displayArea.setText("Η λίστα αγορών είναι άδεια.");
         } else {
-            // Generate the shopping list
+            // Δημιουργία της λίστας αγορών
             ShoppingList shoppingList = new ShoppingList(displayArea);
             shoppingList.generateShoppingList(selectedRecipes);
-            displayArea.setText("Η λίστα αγορών δημιουργήθηκε επιτυχώς!");
         }
     }
+
     private void executeRecipe() {
         if (recipes.isEmpty()) {
-            displayArea.setText("No recipes available to execute.");
+            displayArea.setText("Δεν υπάρχουν διαθέσιμες συνταγές για εκτέλεση.");
             return;
         }
 
@@ -254,7 +260,7 @@ public class Display extends JFrame {
         }
 
         String selectedRecipe = (String) JOptionPane.showInputDialog(this,
-                "Select a recipe to execute:", "Execute Recipe",
+                "Επιλέξτε μια συνταγή για εκτέλεση:", "Εκτέλεση Συνταγής",
                 JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
         if (selectedRecipe != null) {
@@ -262,24 +268,22 @@ public class Display extends JFrame {
                     .filter(r -> r.getTitle().equals(selectedRecipe))
                     .findFirst().orElse(null);
             if (recipe != null) {
-                // Execute recipe asynchronously using SwingWorker
+                // Εκτέλεση συνταγής ασύγχρονα μέσω SwingWorker
                 new SwingWorker<Void, Void>() {
                     @Override
                     protected Void doInBackground() throws Exception {
-                        // Update JTextArea asynchronously
-                        displayArea.append("\nΞεκινάμε την εκτέλεση της συνταγής: " + recipe.getTitle() + "\n");
-
+                        // Ενημέρωση της JTextArea ασύγχρονα
                         RecipeExecutor recipeExecutor = new RecipeExecutor(recipe, displayArea);
-                        recipeExecutor.executeRecipe();  // Execute the recipe in the background
+                        recipeExecutor.executeRecipe();  // Εκτέλεση της συνταγής στο παρασκήνιο
                         return null;
                     }
 
                     @Override
                     protected void done() {
-                        // Optional: Show a message when the recipe execution is done
+                        // Προαιρετικό: Εμφάνιση μηνύματος όταν ολοκληρωθεί η εκτέλεση της συνταγής
                         displayArea.append("\nΗ συνταγή ολοκληρώθηκε επιτυχώς! Καλή σας όρεξη!\n");
                     }
-                }.execute();  // Start the SwingWorker to run asynchronously
+                }.execute();
             }
         }
     }

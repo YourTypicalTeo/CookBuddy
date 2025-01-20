@@ -1,5 +1,10 @@
 package com.mycompany.cookbuddy;
-
+/*
+ *
+ * @author JAVA ASSIGNMENT 2024-2025 Βοηθός Μάγειρας
+it2023101_it2023140_it2023024
+ *
+ */
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,7 +59,7 @@ public class ShoppingList {
         }
 
         // Display the final shopping list in the JTextArea
-        displayArea.append("\nShopping List:\n");
+        displayArea.setText("\nShopping List:\n");
         for (Ingredient ingredient : ingredientTotals.values()) {
             displayArea.append(defineUnit(ingredient.getUnit(), ingredient.getQuantity()) + " " + ingredient.getName() + "\n");
         }
