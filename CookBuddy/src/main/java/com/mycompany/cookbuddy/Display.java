@@ -43,7 +43,6 @@ public class Display extends JFrame {
         btnCreateShoppingList = new JButton("Δημιουργία Λίστας Αγορών");
         btnExecuteRecipe = new JButton("Εκτέλεση Συνταγής");
         btnExit = new JButton("Έξοδος");
-
         buttonPanel.add(btnViewAllRecipes);
         buttonPanel.add(btnViewRecipeDetails);
         buttonPanel.add(btnCreateShoppingList);
@@ -59,7 +58,7 @@ public class Display extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Ζητάμε από τον χρήστη να εισάγει τον αριθμό ατόμων
-                String input = JOptionPane.showInputDialog(Display.this, "Εισάγετε τον αριθμό των ατόμων:");
+                String input = JOptionPane.showInputDialog(Display.this, "Για τις ανάλογες ποσότητες εισάγετε τον αριθμό των ατόμων: ","Αριθμός Ατόμων", JOptionPane.QUESTION_MESSAGE);
                 try {
                     int numberOfPeople = Integer.parseInt(input);
                     if (numberOfPeople > 0) {
