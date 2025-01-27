@@ -12,116 +12,116 @@ import javax.swing.JTextArea;
 
 public class ShoppingList {
 
-    // Pattern for identifying ingredients in recipe steps
+    // Μοτίβο για τον εντοπισμό συστατικών στα βήματα συνταγών
     private static final Pattern INGREDIENT_PATTERN = Pattern.compile("@([\\p{L}0-9_\\- ]+)\\{([^}%]+)%?([^}]*)\\}");
 
-    // Map for converting custom units to standard ones (grams, liters)
+    // Χάρτης για τη μετατροπή προσαρμοσμένων μονάδων σε τυπικές (γραμμάρια, λίτρα)
     private static final Map<String, Double> CUSTOM_UNIT_TO_STANDARD = createCustomUnitToStandardMap();
 
-    // Set for countable items (used for piece-based quantities)
+    // Σύνολο για μετρήσιμα αντικείμενα (χρησιμοποιείται για ποσότητες ανά τεμάχιο)
     private static final Set<String> COUNTABLE_ITEMS = Set.of("αυγα", "κομματια");
 
-    private JTextArea displayArea; // To update the GUI with the shopping list
+    private JTextArea displayArea; // Ενημέρωση του GUI με τη λίστα αγορών
 
     public ShoppingList(JTextArea displayArea) {
         this.displayArea = displayArea;
     }
 
-    // Method to generate and display the shopping list based on recipe ingredients
+    // Μέθοδος για τη δημιουργία και εμφάνιση της λίστας αγορών βάσει των συστατικών των συνταγών
     public void generateShoppingList(List<Recipe> recipes) {
-        Map<String, Ingredient> ingredientTotals = new HashMap<>(); // Map for total quantities of ingredients
+        Map<String, Ingredient> ingredientTotals = new HashMap<>(); // Χάρτης για τις συνολικές ποσότητες συστατικών
 
-        // Loop through each recipe to extract ingredient data
+        // Διαδρομή σε κάθε συνταγή για την εξαγωγή δεδομένων συστατικών
         for (Recipe recipe : recipes) {
             for (String step : recipe.getSteps()) {
                 Matcher matcher = INGREDIENT_PATTERN.matcher(step);
 
-                // Process each identified ingredient
+                // Επεξεργασία κάθε αναγνωρισμένου συστατικού
                 while (matcher.find()) {
-                    String ingredientName = matcher.group(1).trim(); // Ingredient name
-                    String quantityStr = matcher.group(2).trim();   // Quantity
-                    String unit = matcher.group(3).trim();          // Measurement unit
+                    String ingredientName = matcher.group(1).trim(); // Όνομα συστατικού
+                    String quantityStr = matcher.group(2).trim();   // Ποσότητα
+                    String unit = matcher.group(3).trim();          // Μονάδα μέτρησης
 
-                    // Parse the ingredient's quantity and normalize its unit
+                    // Ανάλυση της ποσότητας και κανονικοποίηση της μονάδας
                     Ingredient ingredient = parseIngredient(ingredientName, quantityStr, unit);
 
-                    // Accumulate quantities for the same ingredient
+                    // Συγκέντρωση ποσοτήτων για το ίδιο συστατικό
                     ingredientTotals.putIfAbsent(ingredient.getName(), new Ingredient(ingredientName, 0.0, ingredient.getUnit()));
                     Ingredient existingIngredient = ingredientTotals.get(ingredientName);
 
                     if (existingIngredient.getUnit().equals(ingredient.getUnit())) {
                         existingIngredient.setQuantity(existingIngredient.getQuantity() + ingredient.getQuantity());
                     } else {
-                        displayArea.append("Warning: Mismatched units for ingredient: " + ingredientName + "\n");
+                        displayArea.append("Προειδοποίηση: Ασυμφωνία μονάδων για το συστατικό: " + ingredientName + "\n");
                     }
                 }
             }
         }
 
-        // Display the final shopping list in the JTextArea
-        displayArea.setText("\nShopping List:\n");
+        // Εμφάνιση της τελικής λίστας αγορών στο JTextArea
+        displayArea.setText("\nΛίστα Αγορών:\n");
         for (Ingredient ingredient : ingredientTotals.values()) {
             displayArea.append(defineUnit(ingredient.getUnit(), ingredient.getQuantity()) + " " + ingredient.getName() + "\n");
         }
     }
 
-    // Parse the ingredient details and normalize the quantity and unit
+    // Ανάλυση των λεπτομερειών του συστατικού και κανονικοποίηση ποσότητας και μονάδας
     private Ingredient parseIngredient(String name, String quantityStr, String unit) {
         try {
-            double quantity = Double.parseDouble(quantityStr); // Parse numeric quantity
+            double quantity = Double.parseDouble(quantityStr); // Ανάλυση της αριθμητικής ποσότητας
 
-            // Check for countable items (pieces)
+            // Έλεγχος για μετρήσιμα αντικείμενα (τεμάχια)
             if (COUNTABLE_ITEMS.contains(unit.toLowerCase())) {
-                return new Ingredient(name, quantity, "pcs"); // Handle as pieces
+                return new Ingredient(name, quantity, "pcs"); // Επεξεργασία ως τεμάχια
             }
 
-            // Check for custom units (e.g., pinch, teaspoon)
+            // Έλεγχος για προσαρμοσμένες μονάδες (π.χ., πρέζα, κουταλάκι)
             if (CUSTOM_UNIT_TO_STANDARD.containsKey(unit.toLowerCase())) {
-                double normalizedQuantity = quantity * CUSTOM_UNIT_TO_STANDARD.get(unit.toLowerCase()); // Convert to grams or milliliters
+                double normalizedQuantity = quantity * CUSTOM_UNIT_TO_STANDARD.get(unit.toLowerCase()); // Μετατροπή σε γραμμάρια ή ml
                 return new Ingredient(name, normalizedQuantity, getStandardUnit(unit));
             }
 
-            return new Ingredient(name, quantity, unit); // Return for standard units
+            return new Ingredient(name, quantity, unit); // Επιστροφή για τυπικές μονάδες
         } catch (NumberFormatException e) {
-            displayArea.append("Warning: Invalid quantity format for ingredient: " + name + "\n");
-            return new Ingredient(name, 0.0, unit); // Return with 0 quantity on error
+            displayArea.append("Προειδοποίηση: Μη έγκυρη μορφή ποσότητας για το συστατικό: " + name + "\n");
+            return new Ingredient(name, 0.0, unit); // Επιστροφή με ποσότητα 0 σε περίπτωση σφάλματος
         }
     }
 
-    // Format the unit for display based on quantity and unit
+    // Μορφοποίηση της μονάδας για εμφάνιση βάσει ποσότητας και μονάδας
     private String defineUnit(String unit, double quantity) {
         switch (unit) {
             case "pcs":
-                return String.format("%.0f pieces", quantity); // Format for pieces
+                return String.format("%.0f τεμάχια", quantity); // Μορφοποίηση για τεμάχια
             case "gr":
                 if (quantity > 999) {
-                    return String.format("%.2f kg", quantity / 1000); // Convert from grams to kilograms
+                    return String.format("%.2f κιλά", quantity / 1000); // Μετατροπή από γραμμάρια σε κιλά
                 }
                 break;
             case "ml":
                 if (quantity > 999) {
-                    return String.format("%.2f L", quantity / 1000); // Convert from ml to liters
+                    return String.format("%.2f λίτρα", quantity / 1000); // Μετατροπή από ml σε λίτρα
                 }
                 break;
         }
-        return String.format("%.2f %s", quantity, unit); // Default formatting
+        return String.format("%.2f %s", quantity, unit); // Προεπιλεγμένη μορφοποίηση
     }
 
-    // Return the standard unit for custom measurement units (e.g., pinch, teaspoon)
+    // Επιστροφή τυπικής μονάδας για προσαρμοσμένες μονάδες μέτρησης (π.χ., πρέζα, κουταλάκι)
     private String getStandardUnit(String unit) {
         if ("πρέζα".equalsIgnoreCase(unit) || "κουταλάκι του γλυκού".equalsIgnoreCase(unit) ||
                 "κουταλιά της σούπας".equalsIgnoreCase(unit)) {
-            return "gr"; // Normalize to grams
+            return "gr"; // Κανονικοποίηση σε γραμμάρια
         }
-        return "ml"; // Default to milliliters
+        return "ml"; // Προεπιλογή σε milliliters
     }
 
-    // Create the map for custom measurement units
+    // Δημιουργία χάρτη για προσαρμοσμένες μονάδες μέτρησης
     private static Map<String, Double> createCustomUnitToStandardMap() {
         Map<String, Double> map = new HashMap<>();
-        map.put("πρέζα", 1.0); // Pinch → 1 gram
-        map.put("κουταλάκι του γλυκού", 5.0); // Teaspoon → 5 grams/milliliters
-        map.put("κουταλιά της σούπας", 15.0); // Tablespoon → 15 grams/milliliters
+        map.put("πρέζα", 1.0); // Πρέζα → 1 γραμμάριο
+        map.put("κουταλάκι του γλυκού", 5.0); // Κουταλάκι → 5 γραμμάρια/ml
+        map.put("κουταλιά της σούπας", 15.0); // Κουταλιά → 15 γραμμάρια/ml
         return map;
     }
 }
