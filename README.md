@@ -1,4 +1,4 @@
-#CookBuddy
+# CookBuddy
 *Πληροφορίες*
 Η εφαρμογη ειναι φτιαγμενη μεσω IntelliJ IDEA με JDK 21 LTS και maven 3.9.9
 Η φαρμογη λειτουργει μεσω ενος .jar αρχειου μεσα στο target directory 
