@@ -1,8 +1,8 @@
 # CookBuddy
-*Πληροφορίες*
+## Πληροφορίες
 Η εφαρμογη ειναι φτιαγμενη μεσω IntelliJ IDEA με JDK 21 LTS και maven 3.9.9
-Η φαρμογη λειτουργει μεσω ενος .jar αρχειου μεσα στο target directory 
-που δημιουργειτε αφου κανουμε πρωτα mvn clean για να ειναι καθαρο το directory και επειτα mvn package για να δημιουργηθει το .jar
+.Λειτουργεί μέσω ενός .jar αρχείου μέσα στο target directory 
+που δημιουργείτε αφου κανουμε πρωτα mvn clean για να ειναι καθαρο το directory και έπειτα mvn package για να δημιουργηθεί το .jar
 Η εφαρμογη λειτουργει μεσω: java -jar target/CookBuddy-1.0-SNAPSHOT.jar /Filepath/recipe1.cook
 ετσι ανοιγει ενα παραθυρο 5 επιλογων:
 1. __**Προβολη Ολων των Συνταγων**__
@@ -10,12 +10,13 @@
 3. __**Δημιουργια Λιστας Αγορων**__
 4. __**Εκτελεση Συνταγης**__
 5. __**Εξοδος**__
-**Example εκτέλεσης
+## Εxample εκτέλεσης
+  ```bash
 mvn clean
 mvn package
 __java -jar target/CookBuddy-1.0-SNAPSHOT.jar ~/Recipes/Pancakes.cook__
 mvn clean
-
+  
 Ολα τα file inputs πρεπει να τελειωνουν σε .cook αλλιως δεν θα δεχτει κανενα file το προγραμμα
 καθε κλαση εχει την δικη της λειτουργια οπως η Display το μενου του GUI μαζι με τις λειτουργιες της καθε επιλογης, ή το TextProcessor που επεξεργαζει καθε file που ερχεται και διαβαζει τα ingredients,utensils και times αναλογα.
 Η getTotalTime χειριζεται τον συνολικο χρονο λεπτα και ωρες και τα μετατρεπει αναλογα.
