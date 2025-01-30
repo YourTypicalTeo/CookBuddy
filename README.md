@@ -11,12 +11,11 @@
 4. __**Εκτελεση Συνταγης**__
 5. __**Εξοδος**__
 ## Εxample εκτέλεσης
-  ```bash
-mvn clean
-mvn package
-__java -jar target/CookBuddy-1.0-SNAPSHOT.jar ~/Recipes/Pancakes.cook__
-mvn clean
-  
+``mvn clean``
+``mvn package``
+``java -jar target/CookBuddy-1.0-SNAPSHOT.jar ~/Recipes/Pancakes.cook``
+``mvn clean``
+## Παραπάνω Πληροφορίες
 Ολα τα file inputs πρεπει να τελειωνουν σε .cook αλλιως δεν θα δεχτει κανενα file το προγραμμα
 καθε κλαση εχει την δικη της λειτουργια οπως η Display το μενου του GUI μαζι με τις λειτουργιες της καθε επιλογης, ή το TextProcessor που επεξεργαζει καθε file που ερχεται και διαβαζει τα ingredients,utensils και times αναλογα.
 Η getTotalTime χειριζεται τον συνολικο χρονο λεπτα και ωρες και τα μετατρεπει αναλογα.
